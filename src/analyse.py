@@ -41,49 +41,6 @@ def change_date(con, change_id):
     return con.execute("SELECT date FROM changes WHERE change_id = ?", (change_id,)).fetchone()[0]
 
 
-def switching_streaks(con, threshold=0.85, lookback=10):
-    """Find days when a spot's bills dropped well below normal, and how long each drop lasted.
-
-    Only ordinary college weekdays without a power cut are used, so exams, holidays
-    and weekends do not count as drops. "Normal" is the median of the spot's
-    previous `lookback` such days. Drops that last several days in a row point
-    to groups of students eating elsewhere together, not to chance.
-    """
-    df = pd.read_sql_query(
-        """
-        SELECT b.date, b.site_id, b.bills
-        FROM billing_daily b JOIN calendar c ON c.date = b.date
-        WHERE c.day_type = 'regular' AND c.weekday NOT IN ('Saturday', 'Sunday') AND c.power_cut = 0
-        ORDER BY b.site_id, b.date
-        """, con)
-    c2 = change_date(con, "C2")
-    runs, days = [], []
-    for site, g in df.groupby("site_id"):
-        normal = g["bills"].shift(1).rolling(lookback, min_periods=lookback).median()
-        g = g.assign(dip=g["bills"] < threshold * normal)[normal.notna()]
-        length, last_date = 0, None
-        for r in g.itertuples():
-            if r.dip:
-                length, last_date = length + 1, r.date
-            elif length:
-                runs.append((site, last_date, length))
-                length = 0
-        if length:
-            runs.append((site, last_date, length))
-        for period, part in (("before", g[g["date"] < c2]), ("after", g[g["date"] >= c2])):
-            days.append((period, len(part), int(part["dip"].sum())))
-
-    runs = pd.DataFrame(runs, columns=["site_id", "end_date", "days"])
-    runs["period"] = (runs["end_date"] >= c2).map({True: "after", False: "before"})
-    summary = pd.DataFrame(days, columns=["period", "days", "dip_days"]).groupby("period").sum()
-    summary["dip_days_per_100"] = (100 * summary["dip_days"] / summary["days"]).round(1)
-    summary["drops"] = runs.groupby("period").size()
-    summary["avg_drop_length_days"] = runs.groupby("period")["days"].mean().round(1)
-    summary["share_of_drops_2_days_or_more"] = (
-        100 * (runs["days"] >= 2).groupby(runs["period"]).mean()).round(0)
-    return summary.reindex(["before", "after"]).reset_index()
-
-
 def md_table(df):
     head = "| " + " | ".join(map(str, df.columns)) + " |"
     rule = "|" + "|".join("---" for _ in df.columns) + "|"
@@ -162,130 +119,89 @@ def chart_library_bills(con, path):
     plt.close(fig)
 
 
-def write_findings(r, streaks, path):
-    summary = r["01_spot_summary"]
-    star = r["02_star_dish"]
+def write_findings(r, path):
+    star = r["02_star_dish"].query("rank == 1").set_index("site_id")["item_name"]
     launches = r["03_new_items"]
-    upsell = r["04_upselling"].set_index(["brand", "period"])
-    cal = r["05_waste_by_calendar"].set_index(["day_type", "period"])
+    up = r["04_upselling"].set_index(["brand", "period"])
+    cal = r["05_waste_by_calendar"].set_index(["day_type", "period"])["waste_pct"]
     veg = r["06_veg_vs_chicken"].set_index(["diet", "period"])
-    eng = r["07_engineering_transport"].set_index(["dish_type", "period"])
-    st = streaks.set_index("period")
+    eng = r["07_engineering_transport"].set_index(["dish_type", "period"])["waste_pct"]
+    quiet = r["08_quiet_days"].set_index("period")["quiet_days_per_100"]
 
-    tops = star[star["rank"] == 1].merge(summary[["site_id", "site_name"]], on="site_id")
-    star_view = star.merge(summary[["site_id", "site_name"]], on="site_id")[
-        ["site_name", "rank", "item_name", "share_pct"]]
-    star_view.columns = ["Spot", "Rank", "Item", "Share of spot's sales %"]
-    summary_view = summary[["site_name", "opened", "revenue", "bills", "avg_bill", "waste_pct_of_sales"]]
-    summary_view.columns = ["Spot", "Opened", "Sales (₹)", "Bills", "Average bill (₹)", "Waste % of sales"]
-    launch_view = launches[["item_name", "bills_per_day_before", "bills_per_day_after", "new_item_share_pct"]]
-    launch_view.columns = ["Launch", "Bills per day, 4 weeks before", "Bills per day, 4 weeks after",
-                           "New item's share of SnackJack sales after %"]
-    cal_view = r["05_waste_by_calendar"].pivot(index="day_type", columns="period", values="waste_pct")
-    cal_view = cal_view.reindex(["regular", "exam", "admissions", "holiday"]).reset_index()[
-        ["day_type", "before", "after"]]
-    cal_view["day_type"] = cal_view["day_type"].map(
-        {"regular": "Ordinary day", "exam": "Exams", "admissions": "Admissions", "holiday": "Holidays"})
-    cal_view.columns = ["Kind of day", "Binned % before", "Binned % after"]
-    veg_view = r["06_veg_vs_chicken"][["period", "diet", "share_of_sold_pct", "share_of_binned_pct", "waste_pct"]]
-    veg_view.columns = ["Period", "Dish type", "Share of food eaten %", "Share of food binned %", "Binned % of cooked"]
-    eng_view = r["07_engineering_transport"][["dish_type", "period", "prepared", "wasted", "waste_pct"]]
-    eng_view.columns = ["Dishes", "Period", "Portions sent", "Portions binned", "Binned %"]
-    streak_view = streaks[["period", "dip_days_per_100", "drops", "avg_drop_length_days",
-                           "share_of_drops_2_days_or_more"]]
-    streak_view.columns = ["Period", "Drop days per 100 days", "Drops", "Average length (days)",
-                           "Drops lasting 2+ days %"]
-
-    def star_of(site):
-        return tops.set_index("site_id").loc[site, "item_name"]
+    launch_rows = "\n".join(
+        f"| {row.item_name} | {row.bills_per_day_before:.0f} | {row.bills_per_day_after:.0f} | "
+        f"{row.new_item_share_pct:.0f}% |" for row in launches.itertuples())
 
     text = f"""# Findings
 
-Generated by `src/analyse.py`. Every number below comes from the query results.
-The records are rebuilt sample data (see the README): the problems and what I changed are real,
-the sizes of the effects are illustrative.
+Every number here comes from the SQL in `sql/`, run on the rebuilt records. The problems and the changes are real;
+the sizes are illustrative (see the README).
 
-## The spots
+## 1. Students did not know us
 
-{md_table(summary_view)}
+- **Checked:** which item sells most at each spot (`02_star_dish.sql`).
+- **Found:** {star['FJ-ARTS']} leads FoodJack. {star['SJ-LIB']} leads every SnackJack spot.
+- **Did:** pushed one star item per spot, and launched new trending items with Canva posters and WhatsApp posts.
+- **Did it work:** bills per day, 4 weeks before and after each launch (`03_new_items.sql`):
 
-## 1. A star dish for each spot
+| Launch | Bills per day before | After | New item's share of sales |
+|---|---|---|---|
+{launch_rows}
 
-`sql/02_star_dish.sql`, last six months of sales:
+## 2. A spot would go quiet for a few days
 
-{md_table(star_view)}
+- **Checked:** ordinary weekdays when bills fell below 85% of that spot's usual (`08_quiet_days.sql`).
+- **Found:** no exam, holiday or power cut explained those days. Talking to students did: one friend picks another
+  place and the whole group follows.
+- **Did:** got to know the regulars and kept them in a WhatsApp community.
+- **Did it work:** quiet days went from **{quiet['before']:.0f} in every 100** to **{quiet['after']:.0f} in every 100**.
 
-FoodJack Arts College is led by **{star_of('FJ-ARTS')}**. Every SnackJack spot is led by **{star_of('SJ-LIB')}**. At the
-Engineering College the leader is **{star_of('FJ-ENG')}**, because Kothu Parotta does not survive the trip from the hub
-kitchen (see section 7).
+## 3. Students bought one thing and left
 
-## 2. New items brought students to the counter
+- **Checked:** items per bill and average bill (`04_upselling.sql`).
+- **Did:** suggested one add-on at the counter, in the students' own slang.
+- **Did it work:** items per bill went from {up.loc[('SnackJack', 'before'), 'items_per_bill']:.2f} to
+  {up.loc[('SnackJack', 'after'), 'items_per_bill']:.2f} at SnackJack and {up.loc[('FoodJack', 'before'), 'items_per_bill']:.2f}
+  to {up.loc[('FoodJack', 'after'), 'items_per_bill']:.2f} at FoodJack.
 
-`sql/03_new_items.sql`, SnackJack spots open for the full 8 weeks around each launch:
+## 4. Too much food binned on some days
 
-{md_table(launch_view)}
-
-Each launch was backed by Canva posters and posts in the student WhatsApp community. Bills per day rose after each one.
-Part of each rise comes from other things: the juice jars launched as summer started, when cold drinks sell more
-anyway, and the spots were still growing. So the new item's own share of sales is the cleaner measure.
-
-![SnackJack Library Block bills per day](library_bills.png)
-
-## 3. Students move in groups
-
-`switching_streaks` in `src/analyse.py` marks a drop when a spot's bills on an ordinary weekday fall below 85% of its
-recent normal, and measures how many days each drop lasts.
-
-{md_table(streak_view)}
-
-Before the WhatsApp community and the posters, drops came **{st.loc['before', 'dip_days_per_100']:.1f} days in every 100**
-(only {st.loc['before', 'days']:.0f} ordinary weekdays, so a small sample),
-and {st.loc['before', 'share_of_drops_2_days_or_more']:.0f}% of them lasted two days or more. Random bad days rarely
-come in runs; a group of friends deciding to eat somewhere else for a while does. After, drops came
-{st.loc['after', 'dip_days_per_100']:.1f} days in every 100. The data shows the pattern; talking to the students is
-what explained it.
-
-## 4. Upselling in the students' own language
-
-`sql/04_upselling.sql`, ordinary college days, 8 weeks either side:
-
-| Brand | Items per bill before | after | Average bill before | after |
-|---|---|---|---|---|
-| FoodJack | {upsell.loc[('FoodJack', 'before'), 'items_per_bill']:.2f} | {upsell.loc[('FoodJack', 'after'), 'items_per_bill']:.2f} | {rupees(upsell.loc[('FoodJack', 'before'), 'avg_bill'])} | {rupees(upsell.loc[('FoodJack', 'after'), 'avg_bill'])} |
-| SnackJack | {upsell.loc[('SnackJack', 'before'), 'items_per_bill']:.2f} | {upsell.loc[('SnackJack', 'after'), 'items_per_bill']:.2f} | {rupees(upsell.loc[('SnackJack', 'before'), 'avg_bill'])} | {rupees(upsell.loc[('SnackJack', 'after'), 'avg_bill'])} |
-
-## 5. Waste and the college calendar
-
-`sql/05_waste_by_calendar.sql`, all spots, share of prepared food that was binned:
-
-{md_table(cal_view)}
-
-Before, every open day was prepped like an ordinary day. Exams ({cal.loc[('exam', 'before'), 'waste_pct']:.0f}% binned)
-and hostel holidays ({cal.loc[('holiday', 'before'), 'waste_pct']:.0f}%) were the worst. Planning prep from the exam
-timetable, holidays, admissions, the monthly power cut and the season brought exam days to
-**{cal.loc[('exam', 'after'), 'waste_pct']:.0f}%** and holidays to **{cal.loc[('holiday', 'after'), 'waste_pct']:.0f}%**.
+- **Checked:** % of prepared food binned, by kind of day (`05_waste_by_calendar.sql`).
+- **Found:** we cooked the same every day. Exams ({cal['exam', 'before']:.0f}% binned) and holidays
+  ({cal['holiday', 'before']:.0f}%) were the worst.
+- **Did:** planned each day's prep from the college calendar: exams, holidays, admissions, power cuts and the season.
+- **Did it work:** exam days down to **{cal['exam', 'after']:.0f}%**, holidays to **{cal['holiday', 'after']:.0f}%**,
+  ordinary days from {cal['regular', 'before']:.0f}% to {cal['regular', 'after']:.0f}%.
 
 ![Food binned by kind of day](waste_by_calendar.png)
 
-## 6. What the bin said: veg against chicken
+## 5. Some dishes kept ending up in the bin
 
-FoodJack weighed what was cooked and weighed it again at the bin. `sql/06_veg_vs_chicken.sql`, ordinary college days:
+- **Checked:** weighed FoodJack food before serving and again before binning (`06_veg_vs_chicken.sql`).
+- **Found:** veg dishes were {veg.loc[('veg', 'before'), 'share_of_sold_pct']:.0f}% of what students ate but
+  {veg.loc[('veg', 'before'), 'share_of_binned_pct']:.0f}% of what we binned. They wanted chicken.
+- **Did:** rebuilt the FoodJack menu around chicken.
+- **Did it work:** FoodJack's binned % fell from {veg.loc[('veg', 'before'), 'waste_pct']:.0f}% on veg and
+  {veg.loc[('chicken', 'before'), 'waste_pct']:.0f}% on chicken to {veg.loc[('veg', 'after'), 'waste_pct']:.0f}% and
+  {veg.loc[('chicken', 'after'), 'waste_pct']:.0f}%
+  (the calendar planning in section 4 helped too).
 
-{md_table(veg_view)}
+## 6. Food sent to the Engineering College was binned more
 
-Before the change, veg dishes were **{veg.loc[('veg', 'before'), 'share_of_sold_pct']:.0f}%** of what students ate but
-**{veg.loc[('veg', 'before'), 'share_of_binned_pct']:.0f}%** of what was binned. The menu was rebuilt around chicken:
-the veg versions of kothu parotta, fried rice and noodles came off, and the chicken versions were made in larger batches.
+- **Checked:** waste at that spot, for dishes that travel well against those that do not (`07_engineering_transport.sql`).
+- **Found:** food comes from the hub kitchen. Dishes that do not hold up on the trip were binned at
+  {eng['does not travel well', 'before']:.0f}%, against {eng['travels well', 'before']:.0f}% for the rest.
+- **Did:** changed that spot's menu to dishes that travel well.
+- **Did it work:** the badly travelling dishes are gone, and the rest stayed at about {eng['travels well', 'after']:.0f}%.
 
-## 7. Food that does not travel
+## The loop that kept it working
 
-FoodJack Engineering College gets its food from the hub kitchen at the arts college. `sql/07_engineering_transport.sql`:
+Every day the billing machine totals, the waste weights and counts, and the calendar went into one Excel sheet.
+Every week I looked at the same few numbers: bills per day, items per bill, and % binned by spot. If one moved the
+wrong way, I went and asked the staff and the students why, changed one thing, and checked the same number the next
+week.
 
-{md_table(eng_view)}
-
-Dishes that do not hold up on the trip were binned at **{eng.loc[('does not travel well', 'before'), 'waste_pct']:.0f}%**,
-against {eng.loc[('travels well', 'before'), 'waste_pct']:.0f}% for dishes that do. The Engineering College menu was
-redesigned around the dishes that travel well.
+![SnackJack Library Block bills per day](library_bills.png)
 """
     path.write_text(text, encoding="utf-8")
 
@@ -295,13 +211,11 @@ def main():
     REPORTS.mkdir(exist_ok=True)
     con = load_database()
     results = run_queries(con)
-    streaks = switching_streaks(con)
     for name, df in results.items():
         df.to_csv(OUT / f"{name}.csv", index=False)
-    streaks.to_csv(OUT / "08_switching_streaks.csv", index=False)
     chart_waste_by_calendar(results["05_waste_by_calendar"], REPORTS / "waste_by_calendar.png")
     chart_library_bills(con, REPORTS / "library_bills.png")
-    write_findings(results, streaks, REPORTS / "findings.md")
+    write_findings(results, REPORTS / "findings.md")
     print("Wrote outputs/, reports/findings.md and charts")
 
 

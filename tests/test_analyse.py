@@ -72,7 +72,6 @@ def test_upselling_raised_items_per_bill(results):
         assert u[brand, "after"] > u[brand, "before"]
 
 
-def test_drops_ran_in_streaks_before_the_community(con):
-    s = analyse.switching_streaks(con).set_index("period")
-    assert s.loc["before", "avg_drop_length_days"] >= 2
-    assert s.loc["after", "dip_days_per_100"] < s.loc["before", "dip_days_per_100"]
+def test_quiet_days_fell_after_the_community(results):
+    q = results["08_quiet_days"].set_index("period")["quiet_days_per_100"]
+    assert q["after"] < q["before"] / 2

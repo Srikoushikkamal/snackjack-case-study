@@ -1,0 +1,3 @@
+period,ordinary_days,quiet_days,quiet_days_per_100
+before,100,15,15.0
+after,982,10,1.0
