@@ -1,0 +1,28 @@
+item_id,item_name,brand,category,diet,prep_type,measured_by,portion_kg,price,unit_cost,travels_well,launched_by
+F01,Chicken Biryani,FoodJack,Main course,chicken,batch,kg,0.4,130,55,True,
+F02,Plain Biryani,FoodJack,Main course,veg,batch,kg,0.35,90,32,True,
+F03,Chicken Kothu Parotta,FoodJack,Main course,chicken,batch,kg,0.35,120,48,False,
+F04,Veg Kothu Parotta,FoodJack,Main course,veg,batch,kg,0.35,90,32,False,
+F05,Chicken Fried Rice,FoodJack,Main course,chicken,batch,kg,0.35,110,42,True,
+F06,Veg Fried Rice,FoodJack,Main course,veg,batch,kg,0.35,80,28,True,
+F07,Chicken Noodles,FoodJack,Main course,chicken,batch,kg,0.35,110,42,False,
+F08,Veg Noodles,FoodJack,Main course,veg,batch,kg,0.35,80,28,False,
+F09,Egg Fried Rice,FoodJack,Main course,egg,batch,kg,0.35,90,34,True,
+F10,Chapati and Gravy,FoodJack,Main course,veg,batch,kg,0.3,60,22,True,
+F11,Aloo Parotta,FoodJack,Main course,veg,batch,kg,0.3,70,25,False,
+F12,Ghee Podi Roast,FoodJack,Dosa,veg,to_order,kg,0.25,60,20,False,C6
+F13,Masala Dosa,FoodJack,Dosa,veg,to_order,kg,0.25,60,22,False,C6
+F14,Chicken Special Spice Dosa,FoodJack,Dosa,chicken,to_order,kg,0.25,90,38,False,C6
+S01,Filter Coffee,SnackJack,Hot drink,,to_order,units,,20,7,,
+S02,Masala Tea,SnackJack,Hot drink,,to_order,units,,15,5,,
+S03,Fresh Juice,SnackJack,Cold drink,,batch,units,,50,20,,
+S04,Rose Milk,SnackJack,Cold drink,,to_order,units,,40,15,,
+S05,Milkshake,SnackJack,Cold drink,,to_order,units,,90,35,,
+S06,Veg Sandwich,SnackJack,Snack,,batch,units,,60,25,,
+S07,Chicken Roll,SnackJack,Snack,,batch,units,,90,40,,
+S08,Veg Momos,SnackJack,Snack,,batch,units,,80,30,,
+S09,Chicken Momos,SnackJack,Snack,,batch,units,,100,40,,
+S10,Cheese Fries,SnackJack,Snack,,to_order,units,,80,30,,
+S11,Boba Tea,SnackJack,Cold drink,,batch,units,,120,45,,C5
+S12,Waffles,SnackJack,Snack,,batch,units,,100,35,,C7
+S13,Juice Jar 500 ml,SnackJack,Cold drink,,batch,units,,90,35,,C9

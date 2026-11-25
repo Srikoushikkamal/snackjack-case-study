@@ -1,0 +1,5 @@
+brand,period,items_per_bill,avg_bill
+FoodJack,before,1.35,135.8
+FoodJack,after,1.59,160.3
+SnackJack,before,1.35,61.5
+SnackJack,after,1.61,73.8
