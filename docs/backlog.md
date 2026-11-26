@@ -3,6 +3,9 @@
 The six problems written as user stories and tasks, with acceptance criteria. The same list is in
 `backlog.csv`, ready to import into Jira.
 
+I have this backlog on a Jira Kanban board (FOOD-1 to FOOD-11). The things we actually changed at Snackjack are in
+Done, the weekly check of three numbers is In Progress, and spotting quiet days early is still To Do.
+
 ## Students did not know us
 
 **Find the star dish for each spot** (story, high priority)
