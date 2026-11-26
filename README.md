@@ -30,6 +30,12 @@ The problems and what I did are real. **The data is rebuilt.** I no longer have 
 FoodJack food weighed before serving and before binning, SnackJack leftovers counted, and the college calendar.
 Prices, quantities, the months of each change and the size of each effect are illustrative.
 
+## How I built this
+
+The problems, the decisions and what we changed all come from my time running Snackjack. I used Claude, an AI
+assistant, to help me write the code and put the documents together. I set up the Jira board and the Confluence
+pages myself, and I can walk through any part of this.
+
 ## Running it
 
 ```bash
