@@ -19,7 +19,6 @@ This repo goes back over the problems we had, and for each one shows the same si
 
 The details, with every number: [Findings](reports/findings.md).
 How a day ran and the weekly loop: [How we ran it](docs/how_we_ran_it.md).
-The same problems as user stories with acceptance criteria: [Backlog](docs/backlog.md).
 The changes as user stories with acceptance criteria, ready for Jira: [Backlog](docs/backlog.md).
 
 ![Food binned before and after planning from the college calendar](reports/waste_by_calendar.png)
