@@ -27,7 +27,7 @@ SITES = pd.DataFrame([
     ("FJ-ARTS", "FoodJack, Arts College", "FoodJack", "college", "2023-02-01", "Main kitchen (hub)"),
     ("SJ-LIB", "SnackJack, Arts Library Block", "SnackJack", "college", "2023-02-01", "Own counter"),
     ("SJ-BH", "SnackJack, Boys Hostel", "SnackJack", "hostel", "2023-06-15", "Own counter"),
-    ("FJ-ENG", "FoodJack, Engineering College", "FoodJack", "college", "2023-08-01", "Food sent from the hub"),
+    ("FJ-ENG", "FoodJack, Engineering College", "FoodJack", "college", "2023-08-01", "Ready-made food from the hub; no exhaust for a wok stove"),
     ("SJ-GH", "SnackJack, Girls Hostel", "SnackJack", "hostel", "2024-01-08", "Own counter"),
 ], columns=["site_id", "site_name", "brand", "location", "opened", "kitchen"])
 
@@ -40,26 +40,26 @@ CHANGES = pd.DataFrame([
     ("C5", "2023-08-21", "Boba tea launched", "SnackJack"),
     ("C6", "2023-09-04", "Dosa varieties (podi, masala, potato, hot chutney, ghee podi masala, special spice)", "FJ-ARTS"),
     ("C7", "2023-10-09", "Waffles launched", "SnackJack"),
-    ("C8", "2023-10-16", "Engineering college menu redesigned around dishes that travel well", "FJ-ENG"),
-    ("C9", "2024-03-04", "500 ml juice jars launched for summer", "SnackJack"),
+    ("C8", "2024-03-04", "500 ml juice jars launched for summer", "SnackJack"),
 ], columns=["change_id", "date", "change", "applies_to"])
 CHANGE_DATE = {c: date.fromisoformat(d) for c, d in zip(CHANGES["change_id"], CHANGES["date"])}
 
 # measured_by: kg = FoodJack, cooked in bulk and weighed; units = SnackJack, counted
-# prep_type:   batch = made ahead, leftovers binned; to_order = made when ordered
-# travels_well: whether a FoodJack dish still looks and tastes right after the trip
-#               from the hub kitchen to the engineering college (illustrative)
+# prep_type:   batch = made ahead, leftovers binned; to_order = made when ordered;
+#              vendor = bought in from vendors, not logged as waste
+# needs_wok:  cooked on the Chinese (wok) stove. The engineering college spot has no
+#             exhaust for one, so it only sells food already made at the hub kitchen.
 ITEMS = pd.DataFrame([
-    ("F01", "Chicken Biryani", "FoodJack", "Main course", "chicken", "batch", "kg", 0.40, 130, 55, True, None),
-    ("F02", "Plain Biryani", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 90, 32, True, None),
-    ("F03", "Chicken Kothu Parotta", "FoodJack", "Main course", "chicken", "batch", "kg", 0.35, 120, 48, False, None),
-    ("F04", "Veg Kothu Parotta", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 90, 32, False, None),
+    ("F01", "Chicken Biryani", "FoodJack", "Main course", "chicken", "batch", "kg", 0.40, 130, 55, False, None),
+    ("F02", "Plain Biryani", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 90, 32, False, None),
+    ("F03", "Chicken Kothu Parotta", "FoodJack", "Main course", "chicken", "batch", "kg", 0.35, 120, 48, True, None),
+    ("F04", "Veg Kothu Parotta", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 90, 32, True, None),
     ("F05", "Chicken Fried Rice", "FoodJack", "Main course", "chicken", "batch", "kg", 0.35, 110, 42, True, None),
     ("F06", "Veg Fried Rice", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 80, 28, True, None),
-    ("F07", "Chicken Noodles", "FoodJack", "Main course", "chicken", "batch", "kg", 0.35, 110, 42, False, None),
-    ("F08", "Veg Noodles", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 80, 28, False, None),
+    ("F07", "Chicken Noodles", "FoodJack", "Main course", "chicken", "batch", "kg", 0.35, 110, 42, True, None),
+    ("F08", "Veg Noodles", "FoodJack", "Main course", "veg", "batch", "kg", 0.35, 80, 28, True, None),
     ("F09", "Egg Fried Rice", "FoodJack", "Main course", "egg", "batch", "kg", 0.35, 90, 34, True, None),
-    ("F10", "Chapati and Gravy", "FoodJack", "Main course", "veg", "batch", "kg", 0.30, 60, 22, True, None),
+    ("F10", "Chapati and Gravy", "FoodJack", "Main course", "veg", "batch", "kg", 0.30, 60, 22, False, None),
     ("F11", "Aloo Parotta", "FoodJack", "Main course", "veg", "batch", "kg", 0.30, 70, 25, False, None),
     ("F12", "Ghee Podi Roast", "FoodJack", "Dosa", "veg", "to_order", "kg", 0.25, 60, 20, False, "C6"),
     ("F13", "Masala Dosa", "FoodJack", "Dosa", "veg", "to_order", "kg", 0.25, 60, 22, False, "C6"),
@@ -76,16 +76,17 @@ ITEMS = pd.DataFrame([
     ("S10", "Cheese Fries", "SnackJack", "Snack", None, "to_order", "units", None, 80, 30, None, None),
     ("S11", "Boba Tea", "SnackJack", "Cold drink", None, "batch", "units", None, 120, 45, None, "C5"),
     ("S12", "Waffles", "SnackJack", "Snack", None, "batch", "units", None, 100, 35, None, "C7"),
-    ("S13", "Juice Jar 500 ml", "SnackJack", "Cold drink", None, "batch", "units", None, 90, 35, None, "C9"),
+    ("S13", "Juice Jar 500 ml", "SnackJack", "Cold drink", None, "batch", "units", None, 90, 35, None, "C8"),
+    ("V01", "Vendor Snacks (puffs, samosa)", "FoodJack", "Snack", None, "vendor", "units", None, 20, 14, False, None),
 ], columns=["item_id", "item_name", "brand", "category", "diet", "prep_type", "measured_by", "portion_kg",
-            "price", "unit_cost", "travels_well", "launched_by"])
+            "price", "unit_cost", "needs_wok", "launched_by"])
 
 # Portions sold on an ordinary college day, before any of the changes.
 BASE = {
     "FJ-ARTS": {"F01": 60, "F02": 35, "F03": 70, "F04": 30, "F05": 40, "F06": 25, "F07": 35, "F08": 20,
                 "F09": 25, "F10": 30, "F11": 20, "F12": 30, "F13": 30, "F14": 20},
-    "FJ-ENG": {"F01": 55, "F02": 30, "F03": 40, "F04": 25, "F05": 40, "F06": 25, "F07": 30, "F08": 20,
-               "F09": 25, "F10": 30, "F11": 15},
+    # No exhaust, so no wok stove: ready-made dishes from the hub, snacks straight from vendors.
+    "FJ-ENG": {"F01": 90, "F02": 45, "F10": 50, "F11": 30, "V01": 120},
     "SJ-LIB": {"S01": 120, "S02": 150, "S03": 40, "S04": 30, "S05": 30, "S06": 40, "S07": 25, "S08": 30,
                "S09": 30, "S10": 30, "S11": 60, "S12": 40, "S13": 35},
     "SJ-BH": {"S01": 100, "S02": 120, "S03": 30, "S04": 20, "S05": 40, "S06": 30, "S07": 40, "S08": 30,
@@ -134,8 +135,7 @@ def calendar():
 
 
 ITEM = ITEMS.set_index("item_id").to_dict("index")
-TRAVELS_POORLY = set(ITEMS.loc[ITEMS["travels_well"].eq(False), "item_id"])
-TRAVELS_WELL = set(ITEMS.loc[ITEMS["travels_well"].eq(True), "item_id"])
+NEEDS_WOK = set(ITEMS.loc[ITEMS["needs_wok"].eq(True), "item_id"])
 LAUNCHED_BY = {i: c for i, c in zip(ITEMS["item_id"], ITEMS["launched_by"]) if isinstance(c, str)}
 
 
@@ -149,8 +149,8 @@ def on_menu(site_id, item_id, day):
         return False
     if item_id in VEG_TO_CHICKEN and after("C3", day):
         return False
-    if site_id == "FJ-ENG" and item_id in TRAVELS_POORLY and after("C8", day):
-        return False
+    if site_id == "FJ-ENG" and item_id in NEEDS_WOK:
+        return False  # no exhaust there, so no wok stove
     return True
 
 
@@ -170,12 +170,6 @@ def expected_demand(site, item_id, day, cal):
     if after("C3", day) and item_id in VEG_TO_CHICKEN.values():
         moved = [v for v, c in VEG_TO_CHICKEN.items() if c == item_id]
         base += 0.5 * sum(BASE[site["site_id"]][v] for v in moved)
-    if site["site_id"] == "FJ-ENG":
-        if not after("C8", day) and item_id in TRAVELS_POORLY:
-            base *= 0.8  # arrives soggy or cold, students pick something else
-        if after("C8", day) and item_id in TRAVELS_WELL:
-            base *= 1.25  # the dishes that stayed picked up the demand
-
     if cal["season"] == "summer":
         factor *= 1.4 if item_id in COLD else 0.8 if item_id in HOT else 1.0
     elif cal["season"] == "winter":
@@ -184,7 +178,7 @@ def expected_demand(site, item_id, day, cal):
         factor *= 0.2 if item_id in BLENDER else 0.85
 
     if brand == "SnackJack":
-        launches = sum(after(c, day) for c in ("C5", "C7", "C9"))
+        launches = sum(after(c, day) for c in ("C5", "C7", "C8"))
         factor *= 1.05 ** launches  # each new item brought more students to the counter
     if after("C1", day) and item_id in ADD_ONS:
         factor *= 1.15
@@ -231,10 +225,7 @@ def generate(seed=SEED):
                             regular = (regular + expected_demand(site, partner, _ordinary_day(day),
                                                                  _ordinary_cal(c))) / 2
                         prepared = int(round(regular * 1.10))
-                    spoiled = 0
-                    if sid == "FJ-ENG" and item_id in TRAVELS_POORLY:
-                        spoiled = int(round(prepared * 0.20))
-                    sold = min(demand, prepared - spoiled)
+                    sold = min(demand, prepared)
                     wasted = prepared - sold
                     if it["measured_by"] == "kg":
                         fj_waste.append((c["date"], sid, item_id, round(prepared * it["portion_kg"], 1),

@@ -12,9 +12,9 @@ the sizes are illustrative (see the README).
 
 | Launch | Bills per day before | After | New item's share of sales |
 |---|---|---|---|
-| Boba Tea | 321 | 364 | 20% |
-| Waffles | 373 | 417 | 10% |
-| Juice Jar 500 ml | 421 | 482 | 10% |
+| Boba Tea | 320 | 370 | 20% |
+| Waffles | 370 | 411 | 10% |
+| Juice Jar 500 ml | 421 | 481 | 10% |
 
 ## 2. A spot would go quiet for a few days
 
@@ -22,7 +22,7 @@ the sizes are illustrative (see the README).
 - **Found:** no exam, holiday or power cut explained those days. Talking to students did: one friend picks another
   place and the whole group follows.
 - **Did:** got to know the regulars and kept them in a WhatsApp community.
-- **Did it work:** quiet days went from **15 in every 100** to **1 in every 100**.
+- **Did it work:** quiet days went from **15 in every 100** to **2 in every 100**.
 
 ## 3. Students bought one thing and left
 
@@ -38,7 +38,7 @@ the sizes are illustrative (see the README).
 - **Found:** we cooked the same every day. Exams (44% binned) and holidays
   (88%) were the worst.
 - **Did:** planned each day's prep from the college calendar: exams, holidays, admissions, power cuts and the season.
-- **Did it work:** exam days down to **12%**, holidays to **21%**,
+- **Did it work:** exam days down to **12%**, holidays to **19%**,
   ordinary days from 28% to 12%.
 
 ![Food binned by kind of day](waste_by_calendar.png)
@@ -50,17 +50,19 @@ the sizes are illustrative (see the README).
   56% of what we binned. They wanted chicken.
 - **Did:** rebuilt the FoodJack menu around chicken.
 - **Did it work:** FoodJack's binned % fell from 37% on veg and
-  24% on chicken to 12% and
-  11%
+  24% on chicken to 13% and
+  12%
   (the calendar planning in section 4 helped too).
 
-## 6. Food sent to the Engineering College was binned more
+## 6. The Engineering College spot could not cook
 
-- **Checked:** waste at that spot, for dishes that travel well against those that do not (`07_engineering_transport.sql`).
-- **Found:** food comes from the hub kitchen. Dishes that do not hold up on the trip were binned at
-  22%, against 12% for the rest.
-- **Did:** changed that spot's menu to dishes that travel well.
-- **Did it work:** the badly travelling dishes are gone, and the rest stayed at about 11%.
+- **Checked:** the spot has no exhaust, so a wok stove could not be set up. Kothu parotta, fried rice and noodles
+  could not be made there.
+- **Did:** sold only dishes already made at the hub kitchen (biryani, chapati and gravy, aloo parotta), plus snacks
+  that came straight from vendors.
+- **Did it work:** the ready-made dishes held up. Binned % on them was 12% at the
+  Engineering College against 12% at the Arts College (`07_engineering_menu.sql`), and
+  Chicken Biryani became that spot's best seller.
 
 ## The loop that kept it working
 

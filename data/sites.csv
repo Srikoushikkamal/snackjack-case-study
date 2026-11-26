@@ -2,5 +2,5 @@ site_id,site_name,brand,location,opened,kitchen
 FJ-ARTS,"FoodJack, Arts College",FoodJack,college,2023-02-01,Main kitchen (hub)
 SJ-LIB,"SnackJack, Arts Library Block",SnackJack,college,2023-02-01,Own counter
 SJ-BH,"SnackJack, Boys Hostel",SnackJack,hostel,2023-06-15,Own counter
-FJ-ENG,"FoodJack, Engineering College",FoodJack,college,2023-08-01,Food sent from the hub
+FJ-ENG,"FoodJack, Engineering College",FoodJack,college,2023-08-01,Ready-made food from the hub; no exhaust for a wok stove
 SJ-GH,"SnackJack, Girls Hostel",SnackJack,hostel,2024-01-08,Own counter

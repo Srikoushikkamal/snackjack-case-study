@@ -15,7 +15,7 @@ This repo goes back over the problems we had, and for each one shows the same si
 | Students bought one thing and left | About 1.35 items per bill | Suggested one add-on at the counter, in their slang | About 1.6 items per bill |
 | Food binned on some days | We cooked the same every day; exams and holidays were the worst | Planned prep from the college calendar and the season | Waste on exam days fell from 44% to 12% |
 | Some dishes kept ending up in the bin | Weighing before serving and before binning: veg binned far more than it was eaten | Rebuilt the FoodJack menu around chicken | Veg and chicken now binned at the same low rate |
-| Food sent to the Engineering College was binned more | Some dishes do not survive the trip from the hub kitchen | Changed that spot's menu to dishes that travel well | Those dishes off that menu; the rest binned at the normal rate |
+| The Engineering College spot could not cook | No exhaust there, so no wok stove for kothu parotta, fried rice or noodles | Sold only dishes ready-made at the hub kitchen, plus snacks straight from vendors | Ready-made dishes binned no more than at the Arts College; biryani became its best seller |
 
 The details, with every number: [Findings](reports/findings.md).
 How a day ran and the weekly loop: [How we ran it](docs/how_we_ran_it.md).

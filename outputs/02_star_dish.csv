@@ -1,16 +1,16 @@
 site_id,rank,item_name,share_pct
-FJ-ARTS,1,Chicken Kothu Parotta,24.2
-FJ-ARTS,2,Chicken Biryani,18.2
-FJ-ARTS,3,Chicken Fried Rice,13.3
-FJ-ENG,1,Chicken Biryani,36.0
-FJ-ENG,2,Chicken Fried Rice,29.2
-FJ-ENG,3,Plain Biryani,13.5
+FJ-ARTS,1,Chicken Kothu Parotta,23.9
+FJ-ARTS,2,Chicken Biryani,18.0
+FJ-ARTS,3,Chicken Fried Rice,13.6
+FJ-ENG,1,Chicken Biryani,49.5
+FJ-ENG,2,Plain Biryani,17.0
+FJ-ENG,3,Chapati and Gravy,14.6
 SJ-BH,1,Boba Tea,16.8
-SJ-BH,2,Chicken Momos,11.1
+SJ-BH,2,Chicken Momos,11.3
 SJ-BH,3,Cheese Fries,10.6
-SJ-GH,1,Boba Tea,23.2
-SJ-GH,2,Waffles,10.5
-SJ-GH,3,Milkshake,9.9
+SJ-GH,1,Boba Tea,23.0
+SJ-GH,2,Waffles,10.8
+SJ-GH,3,Milkshake,9.7
 SJ-LIB,1,Boba Tea,20.0
-SJ-LIB,2,Waffles,10.1
-SJ-LIB,3,Juice Jar 500 ml,8.5
+SJ-LIB,2,Waffles,9.8
+SJ-LIB,3,Juice Jar 500 ml,8.6

@@ -1,6 +1,6 @@
 site_id,site_name,opened,days_open,revenue,bills,avg_bill,waste_cost,waste_pct_of_sales
-SJ-BH,"SnackJack, Boys Hostel",2023-06-15,474,15873920,174739,90.8,590565.0,3.7
-FJ-ARTS,"FoodJack, Arts College",2023-02-01,434,15271790,97702,156.3,1097046.0,7.2
-SJ-LIB,"SnackJack, Arts Library Block",2023-02-01,434,14667640,184150,79.7,507715.0,3.5
-SJ-GH,"SnackJack, Girls Hostel",2024-01-08,267,11464645,113054,101.4,389865.0,3.4
-FJ-ENG,"FoodJack, Engineering College",2023-08-01,315,6894960,42350,162.8,371650.0,5.4
+SJ-BH,"SnackJack, Boys Hostel",2023-06-15,474,15931690,175737,90.7,574455.0,3.6
+FJ-ARTS,"FoodJack, Arts College",2023-02-01,434,15227500,97178,156.7,1105034.0,7.3
+SJ-LIB,"SnackJack, Arts Library Block",2023-02-01,434,14627945,183123,79.9,517470.0,3.5
+SJ-GH,"SnackJack, Girls Hostel",2024-01-08,267,11346565,112296,101.0,424560.0,3.7
+FJ-ENG,"FoodJack, Engineering College",2023-08-01,315,6327380,57337,110.4,310468.0,4.9

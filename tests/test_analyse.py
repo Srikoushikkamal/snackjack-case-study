@@ -60,10 +60,9 @@ def test_veg_was_binned_out_of_proportion_before_the_chicken_menu(results):
     assert v.loc[("veg", "before"), "share_of_binned_pct"] > v.loc[("veg", "before"), "share_of_sold_pct"] + 10
 
 
-def test_dishes_that_travel_badly_were_binned_more(results):
-    e = results["07_engineering_transport"].set_index(["dish_type", "period"])["waste_pct"]
-    assert e["does not travel well", "before"] > 1.5 * e["travels well", "before"]
-    assert ("does not travel well", "after") not in e.index
+def test_ready_made_dishes_held_up_at_the_engineering_spot(results):
+    e = results["07_engineering_menu"].set_index("site_name")["waste_pct"]
+    assert abs(e["FoodJack, Engineering College"] - e["FoodJack, Arts College"]) < 3
 
 
 def test_upselling_raised_items_per_bill(results):

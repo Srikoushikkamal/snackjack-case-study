@@ -35,10 +35,11 @@ def test_veg_dishes_come_off_foodjack_after_the_chicken_menu():
     assert on_menu("FJ-ARTS", "F02", date(2024, 1, 1))  # plain biryani stays
 
 
-def test_engineering_menu_drops_dishes_that_travel_badly():
-    assert on_menu("FJ-ENG", "F03", date(2023, 10, 15))
-    assert not on_menu("FJ-ENG", "F03", date(2023, 10, 16))
-    assert on_menu("FJ-ARTS", "F03", date(2024, 1, 1))  # still the star at the arts college
+def test_engineering_spot_never_sells_wok_dishes():
+    sales, *_ = generate()
+    eng = set(sales.loc[sales["site_id"] == "FJ-ENG", "item_id"])
+    assert eng == {"F01", "F02", "F10", "F11", "V01"}
+    assert on_menu("FJ-ARTS", "F03", date(2024, 1, 1))  # kothu parotta stays at the arts college
 
 
 def test_college_spots_closed_on_sundays_and_holidays():

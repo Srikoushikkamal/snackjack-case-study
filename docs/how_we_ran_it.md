@@ -5,7 +5,7 @@
 | Spot | Brand | Sells |
 |---|---|---|
 | Arts College | FoodJack | Meals. Also the hub kitchen |
-| Engineering College | FoodJack | Meals, cooked at the hub and sent over |
+| Engineering College | FoodJack | Ready-made meals from the hub (no exhaust, so no wok stove), snacks from vendors |
 | Arts College Library Block | SnackJack | Snacks, juices, shakes, tea and coffee |
 | Boys Hostel | SnackJack | Same |
 | Girls Hostel | SnackJack | Same |
@@ -20,7 +20,7 @@ power cuts change who turns up. And students choose where to eat with their frie
 flowchart TD
     A[Check the college calendar] --> B[Order stock from vendors on WhatsApp]
     B --> C[Cook at the hub kitchen, weigh it]
-    C --> D[Send food to the Engineering College]
+    C --> D[Send ready-made dishes to the Engineering College]
     C --> E[SnackJack spots prep juice, momos, boba, waffle batter]
     D --> F[Break and lunch rush]
     E --> F

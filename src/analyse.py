@@ -26,7 +26,7 @@ def load_database(data_dir=DATA):
     for table in TABLES:
         df = pd.read_csv(data_dir / f"{table}.csv")
         if table == "items":
-            df["travels_well"] = df["travels_well"].map({True: 1, False: 0, "True": 1, "False": 0})
+            df["needs_wok"] = df["needs_wok"].map({True: 1, False: 0, "True": 1, "False": 0})
         df.to_sql(table, con, index=False)
     con.executescript((SQL / "00_views.sql").read_text())
     return con
@@ -125,7 +125,7 @@ def write_findings(r, path):
     up = r["04_upselling"].set_index(["brand", "period"])
     cal = r["05_waste_by_calendar"].set_index(["day_type", "period"])["waste_pct"]
     veg = r["06_veg_vs_chicken"].set_index(["diet", "period"])
-    eng = r["07_engineering_transport"].set_index(["dish_type", "period"])["waste_pct"]
+    eng = r["07_engineering_menu"].set_index("site_name")["waste_pct"]
     quiet = r["08_quiet_days"].set_index("period")["quiet_days_per_100"]
 
     launch_rows = "\n".join(
@@ -186,13 +186,15 @@ the sizes are illustrative (see the README).
   {veg.loc[('chicken', 'after'), 'waste_pct']:.0f}%
   (the calendar planning in section 4 helped too).
 
-## 6. Food sent to the Engineering College was binned more
+## 6. The Engineering College spot could not cook
 
-- **Checked:** waste at that spot, for dishes that travel well against those that do not (`07_engineering_transport.sql`).
-- **Found:** food comes from the hub kitchen. Dishes that do not hold up on the trip were binned at
-  {eng['does not travel well', 'before']:.0f}%, against {eng['travels well', 'before']:.0f}% for the rest.
-- **Did:** changed that spot's menu to dishes that travel well.
-- **Did it work:** the badly travelling dishes are gone, and the rest stayed at about {eng['travels well', 'after']:.0f}%.
+- **Checked:** the spot has no exhaust, so a wok stove could not be set up. Kothu parotta, fried rice and noodles
+  could not be made there.
+- **Did:** sold only dishes already made at the hub kitchen (biryani, chapati and gravy, aloo parotta), plus snacks
+  that came straight from vendors.
+- **Did it work:** the ready-made dishes held up. Binned % on them was {eng['FoodJack, Engineering College']:.0f}% at the
+  Engineering College against {eng['FoodJack, Arts College']:.0f}% at the Arts College (`07_engineering_menu.sql`), and
+  {star['FJ-ENG']} became that spot's best seller.
 
 ## The loop that kept it working
 

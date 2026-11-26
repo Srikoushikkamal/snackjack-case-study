@@ -1,9 +1,9 @@
 day_type,period,prepared,wasted,waste_pct
 admissions,before,9614.0,1378.0,14.3
-admissions,after,40389.0,5006.0,12.4
+admissions,after,39813.0,4545.0,11.4
 exam,before,11767.0,5132.0,43.6
-exam,after,64134.0,7416.0,11.6
+exam,after,63542.0,7477.0,11.8
 holiday,before,772.0,680.0,88.1
-holiday,after,6485.0,1336.0,20.6
+holiday,after,6485.0,1232.0,19.0
 regular,before,41578.0,11438.0,27.5
-regular,after,416932.0,49141.0,11.8
+regular,after,408671.0,49451.0,12.1
